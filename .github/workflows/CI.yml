@@ -2,8 +2,11 @@ name: Render Keep-Alive
 
 on:
   schedule:
-    # Run every 14 minutes (Render free tier sleeps after 15 mins)
+    # Run every 14 minutes
     - cron: '*/14 * * * *'
+  push:
+    branches: [ main ]
+  workflow_dispatch:
 
 
 jobs:
