@@ -1,5 +1,9 @@
 import streamlit as st
 import requests
+import os
+from dotenv import load_dotenv
+
+load_dotenv()
 
 st.set_page_config(page_title="GitHub Code Mentor", page_icon="🐙")
 
@@ -10,9 +14,11 @@ if st.button("Analyze Portfolio"):
     if username:
         with st.spinner(f"Analyzing {username}'s repositories..."):
             try:
-                # Sending JSON body as expected by the backend
+                # Fetch backend URL from environment variables
+                backend_url = os.getenv("BACKEND_URL", "http://127.0.0.1:8001/review")
+                
                 response = requests.post(
-                    "http://127.0.0.1:8001/review", 
+                    backend_url, 
                     json={"username": username}
                 )
                 
