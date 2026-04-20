@@ -14,17 +14,26 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Ping Services
+        env:
+          BACKEND_URL: ${{ secrets.BACKEND_URL }}
+          FRONTEND_URL: ${{ secrets.FRONTEND_URL }}
         run: |
-          if [ -n "${{ secrets.BACKEND_URL }}" ]; then
-            echo "Pinging Backend..."
-            curl -s -o /dev/null -w "%{http_code}" ${{ secrets.BACKEND_URL }}
+          echo " Starting Keep-Alive Ping..."
+          
+          if [ -z "$BACKEND_URL" ]; then
+            echo " BACKEND_URL calculation skipped: secret not found."
           else
-            echo "BACKEND_URL secret not set. Skipping."
+            echo " Pinging Backend: $BACKEND_URL"
+            status=$(curl -s -L -o /dev/null -w "%{http_code}" --connect-timeout 10 "$BACKEND_URL")
+            echo " Backend returned HTTP $status"
           fi
           
-          if [ -n "${{ secrets.FRONTEND_URL }}" ]; then
-            echo "Pinging Frontend..."
-            curl -s -o /dev/null -w "%{http_code}" ${{ secrets.FRONTEND_URL }}
+          if [ -z "$FRONTEND_URL" ]; then
+            echo " FRONTEND_URL calculation skipped: secret not found."
           else
-            echo "FRONTEND_URL secret not set. Skipping."
+            echo "Pinging Frontend: $FRONTEND_URL"
+            status=$(curl -s -L -o /dev/null -w "%{http_code}" --connect-timeout 10 "$FRONTEND_URL")
+            echo "Frontend returned HTTP $status"
           fi
+          
+          echo "Keep-Alive sequence completed."
